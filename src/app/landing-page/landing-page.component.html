@@ -1,0 +1,69 @@
+<div *ngIf="cookieService.check('username'); else registerBlock">
+  <div class="nav justify-content-end mb-5">
+    <div class="my-3 mx-3">
+    <h5 class="d-inline text-end mx-3">WELCOME: {{username | titlecase}}</h5>
+    <button class="btn btn-dark" (click)="deleteAllCookies()">Logout</button>
+    </div>
+  </div>
+  <div class="container">
+  <button class="btn btn-primary" (click)="hitHive()" [disabled]="hive.healthReport.swarmStatus===0"
+  >Hit</button> <br> <br>
+
+  <button class="btn btn-primary" (click)="resetGame()"
+  >Reset Game</button>
+
+  <div class="container">
+    <h5>Status</h5>
+    <p>Queen is: {{hive.healthReport.isQueenAlive ? 'alive' : 'dead'}}</p>
+    <p>Alive workers: {{hive.healthReport.aliveWorkerBees}}</p>
+    <p>Alive drones: {{hive.healthReport.aliveDroneBees}}</p>
+
+    <h3>Alive bees</h3>
+    <ng-container *ngFor="let bee of hive.aliveBees">
+      <div>
+        <p>{{bee.type | titlecase}} {{bee.beeId}} is {{bee.status}} with {{bee.remainingHP}} HP.</p>
+      </div>
+    </ng-container>
+
+    <h3>Dead bees</h3>
+    <ng-container *ngFor="let bee of hive.deadBees">
+      <div>
+        <p>{{bee.type | titlecase}} {{bee.beeId}} is {{bee.status}} with {{bee.remainingHP}} HP.</p>
+      </div>
+    </ng-container>
+
+    <h3>Battle Log</h3>
+    <ng-container *ngFor="let log of hive.healthReport.hitLog">
+      <p>{{log}}</p>
+    </ng-container>
+  </div>
+  </div>
+</div>
+
+
+<ng-template #registerBlock>
+  <div class="nav justify-content-center mb-5">
+    <div class="my-3 mx-3">
+      <h5 class="d-inline text-center align-middle my-3">Welcome to the bee game!</h5>
+    </div>
+  </div>
+  <div class="container w-25">
+    <form [formGroup]="userForm" (submit)="startGame()">
+      <div class="form-group mb-5">
+        <label for="user" class="control-label w-100 mb-3">Enter your username</label>
+        <input type="text" id="user" formControlName="user" class="form-control">
+        <div *ngIf="userForm.controls['user']?.invalid && (userForm.controls['user']?.dirty || userForm.controls['user']?.touched)" class="alert mt-3">
+          <div *ngIf="userForm.controls['user'].errors?.['required']">
+            Please enter username
+          </div>
+          <div *ngIf="userForm.controls['user'].errors?.['minlength']">
+            Please enter minimum 3 characters
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">
+        Start Game
+      </button>
+    </form>
+  </div>
+</ng-template>
