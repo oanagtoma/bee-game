@@ -1,0 +1,112 @@
+<ng-container *ngIf="isUserLoggedIn(); else registerBlock">
+  <div class="nav justify-content-end mb-5">
+    <div class="my-3 mx-3">
+      <h5 class="d-inline text-end mx-3">WELCOME: {{username | titlecase}}</h5>
+      <button class="btn btn-dark" (click)="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container mb-5">
+    <div class="row justify-content-center mb-2">
+      <div class="col text-center">
+        <h5>Click 'Hit' until you kill the swarm. You can reset the game at any time.</h5>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col text-center">
+        <button class="btn btn-success w-25 me-2" (click)="hitHive()"
+                [disabled]="hive.healthReport.swarmStatus===0">HIT
+        </button>
+        <button class="btn btn-primary w-25 ms-2" (click)="resetGame()">RESET GAME
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container swarm-health mb-5">
+    <table class="table table-hover table-dark text-center">
+      <tbody>
+      <tr>
+        <td>Queen status</td>
+        <td>Alive workers</td>
+        <td>Alive drones</td>
+      </tr>
+      <tr>
+        <td>{{(hive.healthReport.isQueenAlive ? 'alive' : 'dead') | uppercase}}</td>
+        <td>{{hive.healthReport.aliveWorkerBees}}</td>
+        <td>{{hive.healthReport.aliveDroneBees}}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="container text-center swarm-bees" *ngIf="hive.healthReport.swarmStatus!==0; else gameOver">
+    <div class="table table-hover table-sm text-center">
+      <thead class="text-center">
+        Alive bees
+      </thead>
+      <tbody>
+      <tr *ngFor="let bee of hive.aliveBees">
+        <td>{{bee.type | titlecase}} {{bee.beeId}} is {{bee.status}} with {{bee.remainingHP}} HP.</td>
+      </tr>
+      </tbody>
+    </div>
+    <div class="table table-hover table-sm text-center">
+      <thead class="text-center">
+        Dead bees
+      </thead>
+      <tbody>
+      <tr class="text-center" *ngFor="let bee of hive.deadBees">
+        <td>{{bee.type | titlecase}} {{bee.beeId}} is {{bee.status}}.</td>
+      </tr>
+      </tbody>
+    </div>
+    <div class="table table-hover table-sm text-center">
+      <thead class="text-center">
+        Battle log
+      </thead>
+      <tbody>
+      <tr *ngFor="let log of hive.healthReport.hitLog">
+        <td>{{log}}</td>
+      </tr>
+      </tbody>
+    </div>
+    </div>
+  <ng-template #gameOver>
+    <div class="container">
+      <div class="row">
+        <h3 class="text-center text-uppercase">Game over</h3>
+      </div>
+    </div>
+  </ng-template>
+</ng-container>
+
+
+<ng-template #registerBlock>
+  <div class="nav justify-content-center mb-5">
+    <div class="my-3 mx-3">
+      <h5 class="d-inline text-center align-middle my-3">Welcome to the bee game!</h5>
+    </div>
+  </div>
+  <div class="container w-25">
+    <form [formGroup]="userForm" (submit)="startGame()">
+      <div class="form-group mb-5">
+        <label for="user" class="control-label w-100 mb-3">Enter your username</label>
+        <input type="text" id="user" formControlName="user" class="form-control">
+        <div
+          *ngIf="userForm.controls['user']?.invalid && (userForm.controls['user']?.dirty || userForm.controls['user']?.touched)"
+          class="alert mt-3">
+          <div *ngIf="userForm.controls['user'].errors?.['required']">
+            Please enter username
+          </div>
+          <div *ngIf="userForm.controls['user'].errors?.['minlength']">
+            Please enter minimum 3 characters
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">
+        Start Game
+      </button>
+    </form>
+  </div>
+</ng-template>
